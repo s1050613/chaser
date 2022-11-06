@@ -1,0 +1,49 @@
+body {
+	font-family: Rockwell, Arial;
+}
+#map {
+	width: calc(100% - 100px);
+	height: 690px;
+}
+
+#mainCont {
+	position: relative;
+}
+#options {
+	position: absolute;
+	top: 0;
+	right: 0;
+	width: 100px;
+}
+
+._10points {
+	filter: hue-rotate(0deg);
+}
+._20points {
+	filter: hue-rotate(50deg);
+}
+._30points {
+	filter: hue-rotate(100deg);
+}
+._40points {
+	filter: hue-rotate(190deg) brightness(130%);
+}
+._50points {
+	filter: hue-rotate(260deg);
+}
+
+.popup10 > div {
+	background: #67C0FF;
+}
+.popup20 > div {
+	background: #C4A0FF;
+}
+.popup30 > div {
+	background: #FF8BEC
+}
+.popup40 > div {
+	background: #FFD05F;
+}
+.popup50 > div {
+	background: #6CD25C;
+}

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>CHASER v1.0</title>
+		<meta charset="UTF-8">
+		
+		<link rel="stylesheet" href="styles/main.css" type="text/css"/>
+		<script src="scripts/main.js"></script>
+		
+		<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.2/dist/leaflet.css" integrity="sha256-sA+zWATbFveLLNqWO2gtiw3HL/lh1giY/Inf1BJ0z14=" crossorigin=""/>
+		<script src="https://unpkg.com/leaflet@1.9.2/dist/leaflet.js" integrity="sha256-o9N1jGDZrf5tS+Ft4gbIK7mYMipq9lqpVJ91xHSyKhg=" crossorigin=""></script>
+	</head>
+	<body>
+		<h1>CHASER v1.0</h1>
+		<div id="mainCont">
+			<div id="map"></div>
+			<div style="position: relative;" id="markerPointsCont">
+				<div style="position: relative;"><img src="https://unpkg.com/leaflet@1.9.2/dist/images/marker-icon-2x.png" class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive _10points" style="width: 25px; height: 41px;" alt="Marker" tabindex="0" role="button"></div>
+				
+				<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;10 points</p>
+				<div style="position: relative;"><img src="https://unpkg.com/leaflet@1.9.2/dist/images/marker-icon-2x.png" class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive _20points" style="width: 25px; height: 41px;" alt="Marker" tabindex="0" role="button"></div>
+				
+				<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;20 points</p>
+				<div style="position: relative;"><img src="https://unpkg.com/leaflet@1.9.2/dist/images/marker-icon-2x.png" class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive _30points" style="width: 25px; height: 41px;" alt="Marker" tabindex="0" role="button"></div>
+				<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;30 points</p>
+				<div style="position: relative;"><img src="https://unpkg.com/leaflet@1.9.2/dist/images/marker-icon-2x.png" class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive _40points" style="width: 25px; height: 41px;" alt="Marker" tabindex="0" role="button"></div>
+				<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;40 points</p>
+				<div style="position: relative;"><img src="https://unpkg.com/leaflet@1.9.2/dist/images/marker-icon-2x.png" class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive _50points" style="width: 25px; height: 41px;" alt="Marker" tabindex="0" role="button"></div>
+				<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;50 points</p>
+			</div>
+			<div id="options">
+				<label for="showC">Central:</label>
+				<input type="checkbox" checked="true" id="showC" name="central" autocomplete="off"/>
+				<br/>
+				<label for="showN">North:</label>
+				<input type="checkbox" checked="true" id="showN" name="north" autocomplete="off"/>
+				<br/>
+				<label for="showE">East:</label>
+				<input type="checkbox" checked="true" id="showE" name="east" autocomplete="off"/>
+				<br/>
+				<label for="showS">South:</label>
+				<input type="checkbox" checked="true" id="showS" name="south" autocomplete="off"/>
+				<br/>
+				<label for="showW">West:</label>
+				<input type="checkbox" checked="true" id="showW" name="west" autocomplete="off"/>
+				<br/>
+			</div>
+			<div id="locationList">
+				
+			</div>
+		</div>
+	</body>
+</html>
