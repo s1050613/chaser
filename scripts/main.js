@@ -48,11 +48,12 @@ window.onload = () => {
 		}
 	});
 	map.on("locationerror", e => {
-		alert("Location error:\n" + e);
+		//alert("Location error:\n" + e.message);
+		console.log(e);
 	});
 	map.locate();	
 	setInterval(() => {
-		map.locate();
+		//map.locate();
 	}, 10000);
 	
 	fetch("locations.min.json").then(res => res.text()).then(jsonc => {
@@ -130,4 +131,15 @@ window.onload = () => {
 
 function addEvent(el) {
 	console.log(el);
+}
+function doSearch() {
+	markers.forEach(marker => {
+		var text = marker._popup._content.toLowerCase();
+		text = text.slice(text.indexOf("<b>") + 3);
+		text = text.slice(0, text.indexOf("</b>"));
+		if(text.includes(searchInput.value)) {
+			marker.openPopup();
+		}
+	});
+	searchInput.value = "";
 }
