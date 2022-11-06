@@ -16,6 +16,10 @@ body {
 	width: 100px;
 }
 
+.opacityEffect {
+	opacity: 0.6;
+}
+
 ._10points {
 	filter: hue-rotate(0deg);
 }

@@ -57,34 +57,33 @@ window.onload = () => {
 	});
 	map.locate();	
 	setInterval(() => {
-		//map.locate();
+		map.locate();
 	}, 10000);
 	
 	fetch("locations.min.json").then(res => res.text()).then(jsonc => {
-		var json = jsonc.replace(/\\"|"(?:\\"|[^"])*"|(\/\/.*|\/\*[\s\S]*?\*\/)/g, (m, g) => g ? "" : m); // https://stackoverflow.com/a/62945875
+		var json = jsonc.replace(/\\"|"(?:\\"|[^"])*"|(\/\/.*|\/\*[\s\S]*?\*\/)/g, (m, g) => g? "" : m); // https://stackoverflow.com/a/62945875
 		var locations = JSON.parse(json);
 		console.log(locations);
 		locations.forEach((loc, i) => {
-			var popupText = `<div data-marker-n="${i}"><b>${loc.name}</b><br/><u>${precinctNames[loc.precinct]}</u>` + (loc.note? `<br/>${loc.note}` : "") + "<br/><button class='markerBtn' onload='addEvent(this);'>&#9989;</button></div>";
+			var popupText = `<div><b>${loc.name}</b><br/><u>${precinctNames[loc.precinct]}</u>` + (loc.note? `<br/>${loc.note}` : "") + `<br/><button data-marker-n="${i}" class='markerBtn visible' onclick='if(this.classList.toggle("visible")) {
+				this.innerHTML = "&#9989;";
+				selectEl(".idIs${i}").classList.remove("opacityEffect");
+			} else {
+				this.innerHTML = "&#x274C;";
+				selectEl(".idIs${i}").classList.add("opacityEffect");
+			}'>&#9989;</button><script>console.log(43);</script></div>`;
 			var marker = L.marker(loc.pos).addTo(map).bindPopup(popupText, {
 				className: `popup${loc.points}`
 			});
 			L.DomUtil.addClass(marker._icon, `_${loc.points}points`);
 			L.DomUtil.addClass(marker._icon, loc.precinct);
+			L.DomUtil.addClass(marker._icon, `idIs${i}`)
 			markers.push(marker);
 			precincts[marker._leaflet_id] = loc.precinct;
 		});
 	});
 	
 	showC.oninput = showN.oninput = showE.oninput = showS.oninput = showW.oninput = e => {
-		/*markers.forEach(marker => {
-			onsole.log(marker);
-			//map.removeLayer(marker);
-			if(precincts[marker._leaflet_id] && showC.checked) {
-				//map.addLayer(marker);
-				marker.
-			}
-		});*/
 		if(showC.checked) {
 			selectEls(".c").forEach(el => {
 				el.style.display = "block";
@@ -141,7 +140,7 @@ function doSearch() {
 		var text = marker._popup._content.toLowerCase();
 		text = text.slice(text.indexOf("<b>") + 3);
 		text = text.slice(0, text.indexOf("</b>"));
-		if(text.includes(searchInput.value)) {
+		if(text.includes(searchInput.value.toLowerCase())) {
 			marker.openPopup();
 		}
 	});
