@@ -16,6 +16,8 @@ var precincts = [];
 var hasShownLocPopup = false;
 var hasShownError = false;
 
+var userPopup;
+
 window.onload = () => {
 	var redIcon = new L.Icon({
 		iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
@@ -40,11 +42,14 @@ window.onload = () => {
 	});
 	map.on("locationfound", e => {
 		console.log(e.latlng);
-		var userLoc = L.marker(e.latlng, {
+		if(userPopup) {
+			L.removeLayer(userPopup);
+		}
+		userPopup = L.marker(e.latlng, {
 			icon: redIcon
 		}).addTo(map).bindPopup("You are here!");
 		if(!hasShownLocPopup) {
-			userLoc.openPopup();
+			userPopup.openPopup();
 			hasShownLocPopup = true;
 		}
 	});
