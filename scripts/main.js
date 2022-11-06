@@ -52,10 +52,10 @@ window.onload = () => {
 	});
 	map.locate();	
 	setInterval(() => {
-		//map.locate();
+		map.locate();
 	}, 10000);
 	
-	fetch("locations.json").then(res => res.text()).then(jsonc => {
+	fetch("locations.min.json").then(res => res.text()).then(jsonc => {
 		var json = jsonc.replace(/\\"|"(?:\\"|[^"])*"|(\/\/.*|\/\*[\s\S]*?\*\/)/g, (m, g) => g ? "" : m); // https://stackoverflow.com/a/62945875
 		var locations = JSON.parse(json);
 		console.log(locations);
