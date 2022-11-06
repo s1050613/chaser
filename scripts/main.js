@@ -14,6 +14,7 @@ var markers = [];
 var precincts = [];
 
 var hasShownLocPopup = false;
+var hasShownError = false;
 
 window.onload = () => {
 	var redIcon = new L.Icon({
@@ -48,7 +49,10 @@ window.onload = () => {
 		}
 	});
 	map.on("locationerror", e => {
-		//alert("Location error:\n" + e.message);
+		if(!hasShownError) {
+			alert("Location error:\n" + e.message);
+			hasShownError = true;
+		}
 		console.log(e);
 	});
 	map.locate();	
