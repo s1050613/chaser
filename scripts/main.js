@@ -5,6 +5,12 @@ const precinctNames = {
 	s: "South",
 	w: "West"
 };
+const locationServices = false;
+
+var apiId = 0;
+var apiKey = "00000000-0000-0000-0000-000000000000";
+const apiBase = "https://timetableapi.ptv.vic.gov.au";
+const apiVersion = "v3";
 
 const selectEl = document.querySelector.bind(document);
 const selectEls = document.querySelectorAll.bind(document);
@@ -18,7 +24,18 @@ var hasShownError = false;
 
 var userPopup;
 
+var linePoints = [];
+var line;
+var jointLabels = [];
+var totalRouteDis = 0;
+
+var routeEditing = false;
+
 window.onload = () => {
+	document.body.onkeydown = e => {
+		e.key == "z" && linePoints.length && linePoints.pop();
+		updateLine();
+	}
 	var redIcon = new L.Icon({
 		iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
 		shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
@@ -34,6 +51,14 @@ window.onload = () => {
 		attribution: "&copy; <a href='http://www.openstreetmap.org/copyright' target='_blank'>OpenStreetMap</a>"
 	}).addTo(map);
 	L.control.scale().addTo(map);
+
+	var latlngs = [
+		[45.51, -122.68],
+		[37.77, -122.43],
+		[34.04, -118.2]
+	];
+	
+	var polyline = L.polyline(latlngs, {color: 'red'}).addTo(map);
 	
 	map.on("click", e => {
 		//var marker = new L.marker(e.latlng).addTo(map);
@@ -60,10 +85,12 @@ window.onload = () => {
 		}
 		console.log(e);
 	});
-	map.locate();	
-	setInterval(() => {
-		map.locate();
-	}, 10000);
+	if(locationServices) {
+		map.locate();	
+		setInterval(() => {
+			map.locate();
+		}, 10000);
+	}
 	
 	fetch("locations.min.json").then(res => res.text()).then(jsonc => {
 		var json = jsonc.replace(/\\"|"(?:\\"|[^"])*"|(\/\/.*|\/\*[\s\S]*?\*\/)/g, (m, g) => g? "" : m); // https://stackoverflow.com/a/62945875
@@ -79,6 +106,16 @@ window.onload = () => {
 			}'>&#9989;</button><script>console.log(43);</script></div>`;
 			var marker = L.marker(loc.pos).addTo(map).bindPopup(popupText, {
 				className: `popup${loc.points}`
+			}).on("click", e => {
+				if(!routeEditing) {
+					return;
+				}
+				console.log(e);
+				var pos = [e.latlng.lat, e.latlng.lng];
+				if(!linePoints.length || pos[0] != linePoints[linePoints.length - 1][0] && pos[1] != linePoints[linePoints.length - 1][1]) {
+					linePoints.push(pos);
+					updateLine();
+				}
 			});
 			L.DomUtil.addClass(marker._icon, `_${loc.points}points`);
 			L.DomUtil.addClass(marker._icon, loc.precinct);
@@ -88,53 +125,9 @@ window.onload = () => {
 		});
 	});
 	
-	showC.oninput = showN.oninput = showE.oninput = showS.oninput = showW.oninput = e => {
-		if(showC.checked) {
-			selectEls(".c").forEach(el => {
-				el.style.display = "block";
-			});
-		} else {
-			selectEls(".c").forEach(el => {
-				el.style.display = "none";
-			});
-		}
-		if(showN.checked) {
-			selectEls(".n").forEach(el => {
-				el.style.display = "block";
-			});
-		} else {
-			selectEls(".n").forEach(el => {
-				el.style.display = "none";
-			});
-		}
-		if(showE.checked) {
-			selectEls(".e").forEach(el => {
-				el.style.display = "block";
-			});
-		} else {
-			selectEls(".e").forEach(el => {
-				el.style.display = "none";
-			});
-		}
-		if(showS.checked) {
-			selectEls(".s").forEach(el => {
-				el.style.display = "block";
-			});
-		} else {
-			selectEls(".s").forEach(el => {
-				el.style.display = "none";
-			});
-		}
-		if(showW.checked) {
-			selectEls(".w").forEach(el => {
-				el.style.display = "block";
-			});
-		} else {
-			selectEls(".w").forEach(el => {
-				el.style.display = "none";
-			});
-		}
-	};
+	showC.oninput = showN.oninput = showE.oninput = showS.oninput = showW.oninput = updatePrecincts;
+	
+	ptvApiRequest("routes");
 };
 
 function addEvent(el) {
@@ -150,4 +143,118 @@ function doSearch() {
 		}
 	});
 	searchInput.value = "";
+}
+function updateLine() {
+	if(line) {
+		map.removeLayer(line);
+	}
+	line = L.polyline(linePoints, {
+		color: "green"
+	}).addTo(map);
+	while(jointLabels.length) {
+		map.removeLayer(jointLabels.pop());
+	}
+	totalRouteDis = 0;
+	for(var i = 0; i < linePoints.length - 1; i++) {
+		var mid = [(linePoints[i][0] + linePoints[i + 1][0]) / 2, (linePoints[i][1] + linePoints[i + 1][1]) / 2];
+		var dis = L.marker(linePoints[i]).getLatLng().distanceTo(L.marker(linePoints[i + 1]).getLatLng());
+		totalRouteDis += dis;
+		var m = L.marker(mid, {
+			opacity: 0
+		}).bindTooltip(`${Math.round(dis)}m`, {
+			permanent: true,
+			offset: [0, 0],
+			className: "translucentTooltip"
+		}).addTo(map);
+		jointLabels.push(m);
+	}
+	console.log(totalRouteDis);
+	selectEl("#routeDisEl").innerText = Math.round(totalRouteDis);
+}
+function ptvApiRequest(reqUrl) {
+	var fullReq = `/${apiVersion}/${reqUrl}${reqUrl.includes("?")? "&" : "?"}devid=${apiId}`;
+	console.log(fullReq);
+	
+	const shaObj = new jsSHA("SHA-1", "TEXT", {
+		hmacKey: {
+			value: apiKey,
+			format: "TEXT"
+		},
+	});
+	shaObj.update(fullReq);
+	var hmac = shaObj.getHash("HEX").toUpperCase();
+	
+	var fullerReq = `${apiBase}${fullReq}&signature=${hmac}`;
+	console.log(fullerReq);
+	fetch(fullerReq).then(res => res.json()).then(json => {
+		console.log(json);
+	});
+}
+function updatePrecincts() {
+	if(showC.checked) {
+		selectEls(".c").forEach(el => {
+			el.style.display = "block";
+		});
+	} else {
+		selectEls(".c").forEach(el => {
+			el.style.display = "none";
+		});
+	}
+	if(showN.checked) {
+		selectEls(".n").forEach(el => {
+			el.style.display = "block";
+		});
+	} else {
+		selectEls(".n").forEach(el => {
+			el.style.display = "none";
+		});
+	}
+	if(showE.checked) {
+		selectEls(".e").forEach(el => {
+			el.style.display = "block";
+		});
+	} else {
+		selectEls(".e").forEach(el => {
+			el.style.display = "none";
+		});
+	}
+	if(showS.checked) {
+		selectEls(".s").forEach(el => {
+			el.style.display = "block";
+		});
+	} else {
+		selectEls(".s").forEach(el => {
+			el.style.display = "none";
+		});
+	}
+	if(showW.checked) {
+		selectEls(".w").forEach(el => {
+			el.style.display = "block";
+		});
+	} else {
+		selectEls(".w").forEach(el => {
+			el.style.display = "none";
+		});
+	}
+}
+function loadRoute() {
+	linePoints = JSON.parse(selectEl("#routeInput").value);
+	updateLine();
+	selectEl("#routeInput").value = "";
+}
+function toggleRouteEditing(el) {
+	el.innerText = `Route editing: ${["OFF", "ON"][+(routeEditing = !routeEditing)]}`;
+}
+function exportRoute() {
+	navigator.clipboard.writeText(JSON.stringify(linePoints)).then(e => {
+		alert("Copied route to clipboard successfully!");
+	}).catch(e => {
+		alert("Failed to catch route to clipboard!");
+		alert(e);
+	})
+}
+function loadApiCreds() {
+	apiId = +selectEl("#apiIdEl").value;
+	apiKey = selectEl("#apiKeyEl").value;
+	alert("Loaded, perhaps...");
 }

@@ -51,3 +51,7 @@ body {
 .popup50 > div {
 	background: #6CD25C;
 }
+
+.translucentTooltip {
+	opacity: 0.7 !important;
+}

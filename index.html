@@ -9,6 +9,8 @@
 		
 		<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.2/dist/leaflet.css" integrity="sha256-sA+zWATbFveLLNqWO2gtiw3HL/lh1giY/Inf1BJ0z14=" crossorigin=""/>
 		<script src="https://unpkg.com/leaflet@1.9.2/dist/leaflet.js" integrity="sha256-o9N1jGDZrf5tS+Ft4gbIK7mYMipq9lqpVJ91xHSyKhg=" crossorigin=""></script>
+		
+		<script src="scripts/sha1.js"></script>
 	</head>
 	<body>
 		<h1>CHASER v1.0</h1>
@@ -46,9 +48,16 @@
 				<br/>
 				<input type="text" placeholder="Search for a location..." id="searchInput"/>
 				<button onclick="doSearch();">Search!</button>
-			</div>
-			<div id="locationList">
-				
+				<br/>
+				<input type="text" placeholder="Enter route code" id="routeInput"/>
+				<button onclick="loadRoute();">Load route</button>
+				<h4>Route distance: <span id="routeDisEl">0</span>m</h4>
+				<button onclick="toggleRouteEditing(this);">Route editing: OFF</button>
+				<button onclick="exportRoute();">Export route</button>
+				<br/><br/>
+				<input type="number" placeholder="API id" id="apiIdEl" autocomplete="off"/>
+				<input placeholder="API key" id="apiKeyEl" autocomplete="off"/>
+				<button onclick="loadApiCreds();">Submit API credentials</button>
 			</div>
 		</div>
 	</body>
